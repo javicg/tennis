@@ -2,7 +2,7 @@
 Created on 22 Mar 2013
 Tennis player
 
-@author: Javi
+@author: Javi Carretero
 '''
 class Player(object):
     """ Class representing a Tennis player:
@@ -25,7 +25,7 @@ class Player(object):
         return self.__rank
     
     def __str__(self):
-        if(self.__nick_name):
+        if(self.__nick_name is not None):
             return self.__nick_name
         return self.__name + " " + self.__surname
         
