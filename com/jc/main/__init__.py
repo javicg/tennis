@@ -3,9 +3,9 @@ Main Module
 
 @author: Javi Carretero
 """
-from com.jc.Match import Match
+from com.jc.match import Match
 from com.jc import CHAMPIONSHIP_MATCH
-from com.jc.Player import Player
+from com.jc.player import Player
 
 def main():
     # List of players
@@ -13,8 +13,8 @@ def main():
     djokovic = Player("Novak","Djokovic","Djokovic",1)
     
     m = Match(CHAMPIONSHIP_MATCH)
-    m.addPlayer(nadal)
-    m.addPlayer(djokovic)
+    m.addPlayers(nadal)
+    m.addPlayers(djokovic)
     
     m.startMatch()
     
