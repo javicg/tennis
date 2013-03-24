@@ -6,7 +6,7 @@ Tennis Simulation
 '''
 from exception import *
 from com.jc.player import Player
-from com.jc import CHAMPIONSHIP_MATCH
+from com.jc import CHAMPIONSHIP_MATCH, NORMAL_MATCH
 from com.jc.set import Set
 
 class Match(object):
@@ -49,7 +49,14 @@ class Match(object):
             raise MatchAlreadyFinishedError()
         self.getActualSet().incrementScore(player)
         if(self.getActualSet().isFinished()):
-            self.__newSet()
+            setsForPlayer = filter(lambda n: n.isFinished() and n.getWinner() == player, self.__sets)
+            if((self.__match_type == CHAMPIONSHIP_MATCH and len(setsForPlayer) == 3)
+               or
+               (self.__match_type == NORMAL_MATCH and len(setsForPlayer) == 2)):
+                print "Match won by",player
+                self.__winner = player
+            else:
+                self.__newSet()
             
     def score(self):
         setScore = []
