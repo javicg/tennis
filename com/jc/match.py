@@ -15,8 +15,11 @@ class Match(object):
         self.__players = []
         self.__sets = []
         self.__match_type = matchType
+        self.__winner = None
         
     def changeMatchType(self, new_match_type):
+        if(len(self.__sets) != 0):
+            raise MatchAlreadyStartedError()
         self.__match_type = new_match_type
         print "Match has changed from",self.__match_type,"to",new_match_type
     
@@ -33,13 +36,31 @@ class Match(object):
         if(len(self.__players) != 2):
             raise PlayerNumberError(len(self.__players))
         if(len(self.__sets) != 0):
-            raise MatchAlreadyStarted()
+            raise MatchAlreadyStartedError()
         
         print "The match between", self.__players[0], "and", self.__players[1], "is about to start!"
         print "The type of the match is", self.__match_type
-        self.__initialise()
+        self.__newSet()
         
-    def __initialise(self):
-        self.__sets.append(Set())
+    def incrementScore(self, player):
+        if(player not in self.__players):
+            raise InvalidPlayerError(player)
+        if(self.__winner is not None):
+            raise MatchAlreadyFinishedError()
+        self.getActualSet().incrementScore(player)
+        if(self.getActualSet().isFinished()):
+            self.__newSet()
+            
+    def score(self):
+        setScore = []
+        for set in self.__sets:
+            setScore.append(set.score())
+        return setScore
+        
+    def getActualSet(self):
+        return self.__sets[len(self.__sets) - 1]
+        
+    def __newSet(self):
+        self.__sets.append(Set(self.__players))
         
 

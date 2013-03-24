@@ -27,7 +27,7 @@ class MatchTest(unittest.TestCase):
     def test_NoRestartsAllowed(self):
         self.match.addPlayers([self.p1,self.p2])
         self.match.startMatch()
-        self.assertRaises(MatchAlreadyStarted, self.match.startMatch)
+        self.assertRaises(MatchAlreadyStartedError, self.match.startMatch)
         
 if __name__ == "__main__":
     unittest.main()
