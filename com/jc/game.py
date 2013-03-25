@@ -3,35 +3,32 @@ Created on 22 Mar 2013
 
 @author: Javi Carretero
 '''
-from com.jc.point import Point
+from com.jc import Point
 from com.jc.exception import *
+from com.jc.point import TennisPoint
 
-class Game(object):
+class Game(Point):
     """Class representing a Game in Tennis"""
     _minPointsToWin = 4
     
     def __init__(self,players):
-        self.__points = []
-        self.__points.append(Point())
-        self.__winner = None
+        super(Game,self).__init__()
+        self._scorings.append(self._newScoring())
         self.__players = players
-        
-    def getActualPoint(self):
-        return self.__points[len(self.__points) - 1]
         
     def incrementScore(self,player):
         if(player not in self.__players):
             raise InvalidPlayerError(player)
-        if(self.__winner is not None):
+        if(self._winner is not None):
             raise GameAlreadyFinishedError()
-        self.getActualPoint().declareWinner(player)
-        pointsForPlayer = filter(lambda n: n.isFinished() and n.getWinner() == player, self.__points)
-        pointsAgainstPlayer = filter(lambda n: n.isFinished() and n.getWinner() != player, self.__points)
+        super(Game,self).getActualPoint().incrementScore(player)
+        pointsForPlayer = filter(lambda n: n.isFinished() and n.getWinner() == player, self._scorings)
+        pointsAgainstPlayer = filter(lambda n: n.isFinished() and n.getWinner() != player, self._scorings)
         if(len(pointsForPlayer) >= self._minPointsToWin and len(pointsForPlayer) - len(pointsAgainstPlayer) >= 2):
             print self._typeOfGame(),"won by",player
-            self.__winner = player
+            self._winner = player
         else:
-            self.__points.append(Point())
+            self._scorings.append(self._newScoring())
             
     def score(self, player=None):
         if(player is None):
@@ -42,10 +39,8 @@ class Game(object):
             raise InvalidPlayerError(player)
         if(self.isFinished() and self.getWinner() == player):
             return "W"
-        pointsForPlayer = filter(lambda n: n.isFinished() and n.getWinner() == player, self.__points)
-        numGames = len(pointsForPlayer)
-        pointsAgainstPlayer = filter(lambda n: n.isFinished() and n.getWinner() != player, self.__points)
-        numGamesOpp = len(pointsAgainstPlayer)
+        numGames = self.getNumScoringsWon(player)        
+        numGamesOpp = self.getNumScoringsLost(player)
         if(numGames == 0):
             return "0"
         elif(numGames == 1):
@@ -56,12 +51,9 @@ class Game(object):
             return "40"
         elif(numGames == numGamesOpp + 1):
             return "Adv"
-            
-    def getWinner(self):
-        return self.__winner
-            
-    def isFinished(self):
-        return self.__winner is not None
+        
+    def _newScoring(self):
+        return TennisPoint()
     
     def _typeOfGame(self):
         return "Game"
@@ -69,6 +61,9 @@ class Game(object):
 class TieBreak(Game):
     """Class representing a Tiebreak in Tennis"""
     _minPointsToWin = 7
+    
+    def __init__(self, players):
+        super(TieBreak,self).__init__(players)
     
     def score(self, player=None):
         if(player is None):
@@ -79,11 +74,9 @@ class TieBreak(Game):
             raise InvalidPlayerError(player)
         if(self.isFinished() and self.getWinner() == player):
             return "W"
-        pointsForPlayer = filter(lambda n: n.isFinished() and n.getWinner() == player, self.__points)
-        numGames = len(pointsForPlayer)
-        pointsAgainstPlayer = filter(lambda n: n.isFinished() and n.getWinner() != player, self.__points)
-        numGamesOpp = len(pointsAgainstPlayer)
         
+        numGames = self.getNumScoringsWon(player)
+        numGamesOpp = self.getNumScoringsLost(player)
         if(numGames <= 6):
             return str(numGames)
         elif(numGames <= numGamesOpp):

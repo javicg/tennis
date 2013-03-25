@@ -5,36 +5,31 @@ Created on 22 Mar 2013
 '''
 from exception import *
 from com.jc.game import Game, TieBreak
+from com.jc import Point
 
-class Set(object):
+class Set(Point):
     """Class representing a Set in Tennis"""
     def __init__(self, players):
-        self.__games = []
+        super(Set,self).__init__()
         self.__players = players
-        self.__newGame()
-        self.__winner = None
+        self._scorings.append(self._newScoring())
         
     def incrementScore(self, player):
         if(player not in self.__players):
             raise InvalidPlayerError(player)
-        if(self.__winner is not None):
+        if(self._winner is not None):
             raise SetAlreadyFinishedError()
-        self.getActualGame().incrementScore(player)
-        if(self.getActualGame().isFinished()):
-            gamesForPlayer = filter(lambda n: n.isFinished() and n.getWinner() == player, self.__games)
-            numGames = len(gamesForPlayer)
-            gamesAgainstPlayer = filter(lambda n: n.isFinished() and n.getWinner() != player, self.__games)
-            numGamesOpp = len(gamesAgainstPlayer)
+        super(Set,self).getActualPoint().incrementScore(player)
+        if(super(Set,self).getActualPoint().isFinished()):
+            numGames = self.getNumScoringsWon(player)
+            numGamesOpp = self.getNumScoringsLost(player)
             if((numGames >= 6 and numGames >= numGamesOpp + 2)
                 or
-                (isinstance(self.getActualGame(),TieBreak))):
+                (isinstance(super(Set,self).getActualPoint(),TieBreak))):
                 print "Set won by",player
-                self.__winner = player
-            elif(numGames == numGamesOpp == 6):
-                # TieBreak
-                self.__newTieBreak()
+                self._winner = player
             else:
-                self.__newGame()
+                self._scorings.append(self._newScoring())
                 
     def score(self, player=None):
         if(player is None):
@@ -43,22 +38,13 @@ class Set(object):
             return self.score(player1) + "-" + self.score(player2)
         if(player not in self.__players):
             raise InvalidPlayerError(player)
-        gamesForPlayer = filter(lambda n: n.isFinished() and n.getWinner() == player, self.__games)
-        numGames = len(gamesForPlayer)
-        return str(numGames)
-        
-    def getActualGame(self):
-        return self.__games[len(self.__games) - 1]
+        return str(self.getNumScoringsWon(player))
     
-    def getWinner(self):
-        return self.__winner
-            
-    def isFinished(self):
-        return self.__winner is not None
-    
-    def __newGame(self):
-        self.__games.append(Game(self.__players))
-        
-    def __newTieBreak(self):
-        print "Set goes to TieBreak!"
-        self.__games.append(TieBreak(self.__players))
+    def _newScoring(self):
+        numGames = self.getNumScoringsWon(self.__players[0])
+        numGamesOpp = self.getNumScoringsWon(self.__players[1])
+        if(numGames == numGamesOpp == 6):
+            print "Set goes to TieBreak"
+            return TieBreak(self.__players)
+        else:
+            return Game(self.__players)

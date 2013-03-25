@@ -8,17 +8,17 @@ from exception import *
 from com.jc.player import Player
 from com.jc import CHAMPIONSHIP_MATCH, NORMAL_MATCH
 from com.jc.set import Set
+from com.jc import Point
 
-class Match(object):
+class Match(Point):
     """Class representing a Match in Tennis"""
-    def __init__(self, matchType=CHAMPIONSHIP_MATCH):
+    def __init__(self, matchType=NORMAL_MATCH):
+        super(Match,self).__init__()
         self.__players = []
-        self.__sets = []
         self.__match_type = matchType
-        self.__winner = None
         
     def changeMatchType(self, new_match_type):
-        if(len(self.__sets) != 0):
+        if(len(self._scorings) != 0):
             raise MatchAlreadyStartedError()
         self.__match_type = new_match_type
         print "Match has changed from",self.__match_type,"to",new_match_type
@@ -35,39 +35,33 @@ class Match(object):
     def startMatch(self):
         if(len(self.__players) != 2):
             raise PlayerNumberError(len(self.__players))
-        if(len(self.__sets) != 0):
+        if(len(self._scorings) != 0):
             raise MatchAlreadyStartedError()
         
         print "The match between", self.__players[0], "and", self.__players[1], "is about to start!"
         print "The type of the match is", self.__match_type
-        self.__newSet()
+        self._scorings.append(self._newScoring())
         
     def incrementScore(self, player):
         if(player not in self.__players):
             raise InvalidPlayerError(player)
-        if(self.__winner is not None):
+        if(self._winner is not None):
             raise MatchAlreadyFinishedError()
-        self.getActualSet().incrementScore(player)
-        if(self.getActualSet().isFinished()):
-            setsForPlayer = filter(lambda n: n.isFinished() and n.getWinner() == player, self.__sets)
-            if((self.__match_type == CHAMPIONSHIP_MATCH and len(setsForPlayer) == 3)
+        super(Match,self).getActualPoint().incrementScore(player)
+        if(super(Match,self).getActualPoint().isFinished()):
+            setsForPlayer = self.getNumScoringsWon(player)
+            if((self.__match_type == CHAMPIONSHIP_MATCH and setsForPlayer == 3)
                or
-               (self.__match_type == NORMAL_MATCH and len(setsForPlayer) == 2)):
+               (self.__match_type == NORMAL_MATCH and setsForPlayer == 2)):
                 print "Match won by",player
-                self.__winner = player
+                self._winner = player
             else:
-                self.__newSet()
+                self._scorings.append(self._newScoring())
             
     def score(self):
-        setScore = []
-        for set in self.__sets:
-            setScore.append(set.score())
-        return setScore
+        return map(lambda s: s.score(), self._scorings)
         
-    def getActualSet(self):
-        return self.__sets[len(self.__sets) - 1]
-        
-    def __newSet(self):
-        self.__sets.append(Set(self.__players))
+    def _newScoring(self):
+        return Set(self.__players)
         
 

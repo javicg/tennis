@@ -3,16 +3,21 @@ Created on 22 Mar 2013
 
 @author: Javi Carretero
 '''
-class Point(object):
+from com.jc import Point
+
+class TennisPoint(Point):
     """Class representing a Point in Tennis"""
     def __init__(self):
-        self.__winner = None
-    
-    def declareWinner(self,player):
-        self.__winner = player
+        super(TennisPoint,self).__init__()
         
-    def isFinished(self):
-        return self.__winner is not None
-    
-    def getWinner(self):
-        return self.__winner
+    def incrementScore(self,player):
+        self._winner = player
+        
+    def score(self, player=None):
+        if(self._winner is None):
+            return "0"
+        else:
+            if(player is not None and self._winner == player):
+                return "W"
+            else:
+                return "L"
