@@ -9,6 +9,8 @@ from com.jc.player import Player
 from com.jc import CHAMPIONSHIP_MATCH, NORMAL_MATCH
 from com.jc.set import Set
 from com.jc import Point
+import logging
+logger = logging.getLogger(__name__)
 
 class Match(Point):
     """Class representing a Match in Tennis"""
@@ -21,7 +23,7 @@ class Match(Point):
         if(len(self._scorings) != 0):
             raise MatchAlreadyStartedError()
         self.__match_type = new_match_type
-        print "Match has changed from",self.__match_type,"to",new_match_type
+        logger.debug("Match has changed from %s to %s",self.__match_type,new_match_type)
     
     def addPlayers(self, pl):
         if(len(self.__players) == 2):
@@ -38,8 +40,8 @@ class Match(Point):
         if(len(self._scorings) != 0):
             raise MatchAlreadyStartedError()
         
-        print "The match between", self.__players[0], "and", self.__players[1], "is about to start!"
-        print "The type of the match is", self.__match_type
+        logger.info("The match between %s and %s is about to start!", str(self.__players[0]), str(self.__players[1]))
+        logger.debug("The type of the match is %s", self.__match_type)
         self._scorings.append(self._newScoring())
         
     def incrementScore(self, player):
@@ -53,7 +55,7 @@ class Match(Point):
             if((self.__match_type == CHAMPIONSHIP_MATCH and setsForPlayer == 3)
                or
                (self.__match_type == NORMAL_MATCH and setsForPlayer == 2)):
-                print "Match won by",player
+                logger.info("Match won by %s",str(player))
                 self._winner = player
             else:
                 self._scorings.append(self._newScoring())

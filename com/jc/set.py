@@ -6,6 +6,8 @@ Created on 22 Mar 2013
 from exception import *
 from com.jc.game import Game, TieBreak
 from com.jc import Point
+import logging
+logger = logging.getLogger(__name__)
 
 class Set(Point):
     """Class representing a Set in Tennis"""
@@ -26,7 +28,7 @@ class Set(Point):
             if((numGames >= 6 and numGames >= numGamesOpp + 2)
                 or
                 (isinstance(super(Set,self).getActualPoint(),TieBreak))):
-                print "Set won by",player
+                logger.debug("Set won by %s",str(player))
                 self._winner = player
             else:
                 self._scorings.append(self._newScoring())
@@ -44,7 +46,7 @@ class Set(Point):
         numGames = self.getNumScoringsWon(self.__players[0])
         numGamesOpp = self.getNumScoringsWon(self.__players[1])
         if(numGames == numGamesOpp == 6):
-            print "Set goes to TieBreak"
+            logger.debug("Set goes to TieBreak")
             return TieBreak(self.__players)
         else:
             return Game(self.__players)

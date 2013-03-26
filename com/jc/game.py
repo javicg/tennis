@@ -6,6 +6,8 @@ Created on 22 Mar 2013
 from com.jc import Point
 from com.jc.exception import *
 from com.jc.point import TennisPoint
+import logging
+logger = logging.getLogger(__name__)
 
 class Game(Point):
     """Class representing a Game in Tennis"""
@@ -25,7 +27,7 @@ class Game(Point):
         pointsForPlayer = filter(lambda n: n.isFinished() and n.getWinner() == player, self._scorings)
         pointsAgainstPlayer = filter(lambda n: n.isFinished() and n.getWinner() != player, self._scorings)
         if(len(pointsForPlayer) >= self._minPointsToWin and len(pointsForPlayer) - len(pointsAgainstPlayer) >= 2):
-            print self._typeOfGame(),"won by",player
+            logger.debug("%s won by %s",self._typeOfGame(),str(player))
             self._winner = player
         else:
             self._scorings.append(self._newScoring())

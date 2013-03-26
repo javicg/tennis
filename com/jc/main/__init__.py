@@ -3,6 +3,9 @@ Main Module
 
 @author: Javi Carretero
 """
+import logging.config
+logging.config.fileConfig('logging.cfg')
+
 from com.jc.match import Match
 from com.jc import CHAMPIONSHIP_MATCH, NORMAL_MATCH
 from com.jc.player import Player
